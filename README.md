@@ -1,5 +1,5 @@
 ## Live frontend Link:- 
-campus-x-change-gamma.vercel.app
+https://campus-x-change-gamma.vercel.app/auth/login
 
 # CampusXchange - A Campus Marketplace for Students
 
