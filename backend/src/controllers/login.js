@@ -6,7 +6,7 @@ export default async function login(req, res) {
 
     // Call login service → returns { token, user }
     const { token, user } = await authService(email, password);
-
+    
     // Send response
     res.status(200).json({
       message: "Login successful",
