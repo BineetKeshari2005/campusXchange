@@ -33,14 +33,23 @@ export default function HomePage() {
 
   // ⬇ Fetch Listings From Backend
   const fetchListings = async () => {
-    try {
-      const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings`);
-      setListings(res.data.items);
-      setFiltered(res.data.items);
-    } catch (err) {
-      console.error("Failed to fetch listings", err);
+  try {
+    const res = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/listings`);
+    const data = await res.json();
+
+    console.log("LISTINGS:", data);
+
+    if (!res.ok) {
+      alert("Listings fetch failed: " + data.message);
+      return;
     }
-  };
+
+    setListings(data.items);
+    setFiltered(data.items);
+  } catch (error) {
+    console.error("Fetch error:", error);
+  }
+};
 
   useEffect(() => {
     fetchListings();
