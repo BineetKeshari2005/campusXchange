@@ -1,75 +1,45 @@
-import * as chatService from "../services/chat.js";
+import {
+  sendMessage,
+  getOrCreateConversation,
+  getConversationMessages,
+} from "../services/chat.js";
 
-// POST /api/chat/start/:userId
+// Start or return existing conversation
 export const startConversation = async (req, res) => {
   try {
-    const otherUserId = req.params.userId;
-    const myId = req.user.id;
+    const userId = req.user.id; 
+    const { sellerId } = req.body;
 
-    const convo = await chatService.getOrCreateConversation(myId, otherUserId);
+    if (!sellerId) {
+      return res.status(400).json({ message: "sellerId missing" });
+    }
 
-    res.status(200).json(convo);
+    const conversation = await getOrCreateConversation(userId, sellerId);
+
+    return res.status(200).json({
+      message: "Conversation ready",
+      conversationId: conversation._id,
+    });
   } catch (err) {
-    console.error("startConversation error:", err);
-    res.status(500).json({ message: "Failed to start conversation" });
+    console.error("Start Conversation Error:", err);
+    return res.status(500).json({ message: "Failed to start conversation" });
   }
 };
 
-// GET /api/chat
-export const getMyConversations = async (req, res) => {
+// Get all messages in a conversation
+export const getMessages = async (req, res) => {
   try {
-    const myId = req.user.id;
-    const convos = await chatService.getUserConversations(myId);
-    res.status(200).json(convos);
-  } catch (err) {
-    console.error("getMyConversations error:", err);
-    res.status(500).json({ message: "Failed to fetch conversations" });
-  }
-};
-
-// GET /api/chat/:conversationId/messages
-export const getConversationMessages = async (req, res) => {
-  try {
-    const { page, limit } = req.query;
-    const data = await chatService.getMessages(
-      req.params.conversationId,
-      page,
-      limit
-    );
-    res.status(200).json(data);
-  } catch (err) {
-    console.error("getConversationMessages error:", err);
-    res.status(500).json({ message: "Failed to fetch messages" });
-  }
-};
-
-// POST /api/chat/:conversationId/message
-export const sendMessageHttp = async (req, res) => {
-  try {
-    const { text, receiverId } = req.body;
-    const senderId = req.user.id;
     const { conversationId } = req.params;
 
-    if (!text || !receiverId) {
-      return res.status(400).json({ message: "text and receiverId are required" });
+    if (!conversationId) {
+      return res.status(400).json({ message: "conversationId missing" });
     }
 
-    const message = await chatService.sendMessage(
-      conversationId,
-      senderId,
-      receiverId,
-      text
-    );
+    const messages = await getConversationMessages(conversationId);
 
-    // also emit via socket.io if available
-    const io = req.app.get("io");
-    if (io) {
-      io.to(conversationId).emit("new_message", message);
-    }
-
-    res.status(201).json(message);
+    return res.status(200).json({ items: messages });
   } catch (err) {
-    console.error("sendMessageHttp error:", err);
-    res.status(500).json({ message: "Failed to send message" });
+    console.error("Get Messages Error:", err);
+    return res.status(500).json({ message: "Failed to fetch messages" });
   }
 };

@@ -25,8 +25,12 @@ export const unsaveListing = async (req, res) => {
 export const getMySavedListings = async (req, res) => {
   try {
     const saved = await getSavedListings(req.user.id);
-    res.status(200).json(saved.savedListings);
+
+    return res.status(200).json({
+      items: saved.savedListings || []
+    });
   } catch (err) {
-    res.status(500).json({ message: "Failed to fetch saved listings" });
+    console.error("Saved fetching error:", err);
+    return res.status(500).json({ message: "Failed to fetch saved listings" });
   }
 };

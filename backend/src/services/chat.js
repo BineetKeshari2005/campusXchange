@@ -1,68 +1,34 @@
-import Conversation from "../models/chatConversation.js";
-import Message from "../models/chatMessage.js";
+import Conversation from "../models/Conversation.js";
+import Message from "../models/Message.js";
 
-// create or find 1-1 conversation between two users
-export const getOrCreateConversation = async (userId1, userId2) => {
-  let convo = await Conversation.findOne({
-    participants: { $all: [userId1, userId2] },
-    $expr: { $eq: [{ $size: "$participants" }, 2] },
-  });
-
-  if (!convo) {
-    convo = await Conversation.create({
-      participants: [userId1, userId2],
-    });
-  }
-
-  return convo;
-};
-
+// Save a new message
 export const sendMessage = async (conversationId, senderId, receiverId, text) => {
-  // create message
-  const msg = await Message.create({
-    conversation: conversationId,
-    sender: senderId,
-    receiver: receiverId,
+  const message = await Message.create({
+    conversationId,
+    senderId,
+    receiverId,
     text,
   });
 
-  // update conversation last message
-  await Conversation.findByIdAndUpdate(conversationId, {
-    lastMessage: text,
-    lastMessageAt: new Date(),
+  return message;
+};
+
+// Get or create a conversation between 2 users
+export const getOrCreateConversation = async (user1, user2) => {
+  let conversation = await Conversation.findOne({
+    participants: { $all: [user1, user2] },
   });
 
-  // populate sender/receiver for frontend use
-  return msg.populate("sender receiver", "name email profilePhoto");
+  if (!conversation) {
+    conversation = await Conversation.create({
+      participants: [user1, user2],
+    });
+  }
+
+  return conversation;
 };
 
-export const getMessages = async (conversationId, page = 1, limit = 20) => {
-  const pageNum = Number(page) || 1;
-  const limitNum = Number(limit) || 20;
-  const skip = (pageNum - 1) * limitNum;
-
-  const messages = await Message.find({ conversation: conversationId })
-    .sort({ createdAt: -1 })
-    .skip(skip)
-    .limit(limitNum)
-    .populate("sender receiver", "name email profilePhoto");
-
-  const total = await Message.countDocuments({ conversation: conversationId });
-
-  return {
-    items: messages.reverse(), // oldest → newest order for UI
-    total,
-    page: pageNum,
-    totalPages: Math.ceil(total / limitNum),
-  };
-};
-
-export const getUserConversations = async (userId) => {
-  const convos = await Conversation.find({
-    participants: userId,
-  })
-    .sort({ lastMessageAt: -1 })
-    .populate("participants", "name email profilePhoto");
-
-  return convos;
+// Get messages in a conversation
+export const getConversationMessages = async (conversationId) => {
+  return await Message.find({ conversationId }).sort({ createdAt: 1 });
 };
