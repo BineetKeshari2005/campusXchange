@@ -15,6 +15,8 @@ export default function ProductDetail() {
   // Fetch Product
   // ---------------------------
   const fetchProduct = async () => {
+    if (!id || id === "undefined") return;
+
     try {
       const res = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/api/listings/${id}`
@@ -23,7 +25,7 @@ export default function ProductDetail() {
       const data = await res.json();
       console.log("PRODUCT:", data);
 
-      if (!data._id) {
+      if (!data || !data._id) {
         console.warn("Product not found");
         return;
       }
@@ -64,7 +66,7 @@ export default function ProductDetail() {
   };
 
   // ---------------------------
-  // Start Chat
+  // Start Chat (FIXED)
   // ---------------------------
   const startChat = async () => {
     const token = localStorage.getItem("token");
@@ -85,8 +87,7 @@ export default function ProductDetail() {
             Authorization: `Bearer ${token}`,
           },
           body: JSON.stringify({
-            sellerId: product.seller._id,
-            listingId: product._id,
+            sellerId: product.seller._id,     // ONLY send this
           }),
         }
       );
@@ -111,7 +112,7 @@ export default function ProductDetail() {
   };
 
   useEffect(() => {
-    if (id) fetchProduct();
+    fetchProduct();
   }, [id]);
 
   if (loading || !product) {
