@@ -145,7 +145,12 @@ export default function ProductDetail() {
           <div className="space-y-3">
             <div className="flex justify-between">
               <span className="text-gray-600">Name:</span>
-              <span className="font-medium">{seller.name}</span>
+              <span
+                className="font-medium text-blue-600 cursor-pointer"
+                onClick={() => router.push(`/user/${seller._id}`)}
+              >
+                {seller.name}
+              </span>
             </div>
 
             <div className="flex justify-between">
