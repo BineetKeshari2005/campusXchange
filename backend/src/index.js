@@ -12,8 +12,8 @@ import userRoute from "./routes/user.js";
 import listingRoutes from "./routes/listing.js";
 import profileRoutes from "./routes/profile.js";
 import savedRoutes from "./routes/saved.js";
-import chatRoutes from "./routes/chat.js"; // ⬅ we’ll create this file
-import * as chatService from "./services/chat.js"; // ⬅ we’ll create this file
+import publicUserRoutes from "./routes/publicUser.js";
+
 
 dotenv.config();
 connectDB();
@@ -100,12 +100,13 @@ io.on("connection", (socket) => {
 
 // ROUTES
 app.use("/api/listings", listingRoutes);
+
 app.use("/api/profile", profileRoutes);
 app.use("/api/saved", savedRoutes);
-app.use("/api/chat", chatRoutes);
 app.use("/user", signupRoute);
 app.use("/auth", loginRoute);
 app.use("/api", userRoute);
+app.use("/api/public-user", publicUserRoutes);
 
 // Root
 app.get("/", (req, res) => {
