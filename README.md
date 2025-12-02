@@ -25,7 +25,7 @@ CampusXchange will be a full‑stack web platform designed exclusively for campu
 The platform will include:
 
 * Secure JWT‑based authentication
-* User role management (Admin & Student)
+* User role management (Student)
 * CRUD operations via RESTful APIs
 * Campus‑specific listings with search, filter, and sorting
 * Pagination for performance and smoother browsing
@@ -37,11 +37,9 @@ The platform will include:
 * Allow students to **create, read, update, and delete (CRUD)** item listings.
 * Implement **secure JWT authentication** for users and admins.
 * Provide **advanced search, sorting, filtering, and pagination** for item listings.
-* Enable **real‑time chat** between buyers and sellers using Socket.io.
 * Support dynamic data fetching across pages using APIs.
-* Allow admins to **monitor and moderate** inappropriate content.
 * Include **wishlist** and **notification** features.
-* Offer **AI‑powered price suggestions** for sellers.
+
 
 ---
 
@@ -57,17 +55,10 @@ The platform will include:
 
 ### 6. **Roles & Responsibilities**
 
-#### **Admin**
-
-* Manage users
-* Approve or reject listings
-* Moderate inappropriate content
-
 #### **Student User**
 
 * Register and manage profile
 * Create and manage listings
-* Chat with buyers/sellers
 * Wishlist and search for products
 
 ---
