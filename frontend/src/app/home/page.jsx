@@ -4,6 +4,8 @@ import React, { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
 import { FiSearch } from "react-icons/fi";
+import { FaUserCircle } from "react-icons/fa"; 
+import { VscNotebook } from "react-icons/vsc"; // Icon for My Listings
 
 export default function HomePage() {
   const router = useRouter();
@@ -11,7 +13,7 @@ export default function HomePage() {
   const [filtered, setFiltered] = useState([]);
   const [search, setSearch] = useState("");
   const [activeCategory, setActiveCategory] = useState("All");
-  const [savedIds, setSavedIds] = useState([]); // <-- IDs of saved listings
+  const [savedIds, setSavedIds] = useState([]); 
 
   const categories = [
     "All",
@@ -52,7 +54,7 @@ export default function HomePage() {
   // Fetch saved listings for logged-in user
   const fetchSaved = async () => {
     const token = localStorage.getItem("token");
-    if (!token) return; // not logged in, hearts will all be empty
+    if (!token) return; 
 
     try {
       const res = await fetch(
@@ -71,7 +73,6 @@ export default function HomePage() {
         return;
       }
 
-      // backend returns array of saved listing docs
       const ids = Array.isArray(data) ? data.map((item) => item._id) : [];
       setSavedIds(ids);
     } catch (err) {
@@ -158,92 +159,51 @@ export default function HomePage() {
   };
 
   return (
-    <div className="min-h-screen bg-white">
-      {/* NAVBAR */}
-      <nav className="flex justify-between items-center px-8 py-4 border-b shadow-sm bg-white">
-        <h1
-          className="text-3xl font-bold text-blue-600 cursor-pointer"
-          onClick={() => router.push("/home")}
-        >
-          CampusXchange
-        </h1>
+    <div className="min-h-screen bg-gray-50">
 
-        <div className="flex items-center gap-4">
-          <button
-            onClick={() => router.push("/sell")}
-            className="px-6 py-2 bg-blue-600 text-white rounded-full font-medium hover:bg-blue-700 transition"
-          >
-            + SELL
-          </button>
 
-          <button
-            onClick={() => router.push("/my-listings")}
-            className="px-4 py-2 text-gray-600 hover:text-blue-600"
-          >
-            My Listings
-          </button>
-
-          <button
-            onClick={() => router.push("/saved")}
-            className="px-4 py-2 text-gray-600 hover:text-red-600"
-          >
-            Saved
-          </button>
-          <button
-            onClick={() => router.push("/profile")}
-            className="px-4 py-2 text-gray-600 hover:text-green-600"
-          >
-            Profile
-          </button>
-          <button
-            onClick={handleLogout}
-            className="text-red-500 font-medium hover:underline"
-          >
-            Logout
-          </button>
-        </div>
-      </nav>
-
-      {/* SEARCH BAR */}
-      <div className="flex justify-center mt-6 px-4">
-        <div className="flex items-center w-full max-w-3xl border rounded-lg shadow-sm px-4 py-3 bg-white">
-          <FiSearch className="text-gray-500 text-xl mr-2" />
+      {/* SEARCH BAR: Centered and polished */}
+      <div className="flex justify-center mt-8 px-4">
+        <div className="flex items-center w-full max-w-4xl border border-gray-200 rounded-xl shadow-lg px-5 py-3 bg-white focus-within:ring-2 focus-within:ring-blue-500 transition duration-300">
+          <FiSearch className="text-gray-400 text-xl mr-3" />
           <input
             type="text"
-            placeholder='Search items (ex: "Book", "Phone")'
+            placeholder='Search items (ex: "Book", "Phone", "Notes")'
             value={search}
             onChange={(e) => setSearch(e.target.value)}
-            className="w-full outline-none text-gray-700"
+            className="w-full outline-none text-gray-800 placeholder-gray-400 text-base"
           />
         </div>
       </div>
 
-      {/* CATEGORY BAR */}
-      <div className="flex gap-6 px-6 mt-6 overflow-x-auto pb-2 text-gray-700 font-medium">
-        {categories.map((cat) => (
-          <button
-            key={cat}
-            onClick={() => setActiveCategory(cat)}
-            className={`pb-1 border-b-2 transition ${
-              activeCategory === cat
-                ? "border-blue-600 text-blue-600"
-                : "border-transparent hover:text-blue-500"
-            }`}
-          >
-            {cat.charAt(0).toUpperCase() + cat.slice(1)}
-          </button>
-        ))}
+      {/* CATEGORY BAR: Clean tab selection */}
+      <div className="flex justify-center mt-6 px-6 overflow-x-auto pb-2">
+        <div className="flex gap-4 sm:gap-6 text-sm font-medium whitespace-nowrap">
+          {categories.map((cat) => (
+            <button
+              key={cat}
+              onClick={() => setActiveCategory(cat)}
+              className={`pb-1 transition duration-200 ${
+                activeCategory === cat
+                  ? "text-blue-600 border-b-2 border-blue-600 font-semibold"
+                  : "text-gray-600 hover:text-blue-500 border-b-2 border-transparent"
+              }`}
+            >
+              {cat.charAt(0).toUpperCase() + cat.slice(1)}
+            </button>
+          ))}
+        </div>
       </div>
 
-      {/* LISTINGS GRID */}
-      <div className="px-6 mt-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-8">
+      {/* LISTINGS GRID: Enhanced card design */}
+      <div className="px-6 py-8 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 xl:grid-cols-5 gap-6">
         {filtered.map((item) => {
           const isSaved = savedIds.includes(item._id);
 
           return (
             <div
               key={item._id}
-              className="border rounded-lg shadow-sm hover:shadow-md transition bg-white cursor-pointer"
+              className="border border-gray-100 rounded-xl shadow-lg hover:shadow-xl transition transform hover:-translate-y-0.5 bg-white cursor-pointer overflow-hidden"
               onClick={() => router.push(`/product/${item._id}`)}
             >
               <div className="relative">
@@ -253,13 +213,13 @@ export default function HomePage() {
                     "https://via.placeholder.com/400x300?text=No+Image"
                   }
                   alt={item.title}
-                  className="w-full h-48 object-cover rounded-t-lg"
+                  className="w-full h-48 object-cover rounded-t-xl"
                 />
 
                 {/* HEART ICON */}
                 {isSaved ? (
                   <AiFillHeart
-                    className="absolute top-3 right-3 text-2xl text-red-500 bg-white rounded-full p-1 shadow-sm"
+                    className="absolute top-3 right-3 text-3xl text-red-500 bg-white rounded-full p-1 shadow-md"
                     onClick={(e) => {
                       e.stopPropagation(); // don't open product page
                       toggleSave(item._id);
@@ -267,7 +227,7 @@ export default function HomePage() {
                   />
                 ) : (
                   <AiOutlineHeart
-                    className="absolute top-3 right-3 text-2xl text-gray-700 bg-white rounded-full p-1 shadow-sm hover:text-red-500"
+                    className="absolute top-3 right-3 text-3xl text-gray-700 bg-white rounded-full p-1 shadow-md hover:text-red-500"
                     onClick={(e) => {
                       e.stopPropagation();
                       toggleSave(item._id);
@@ -277,25 +237,29 @@ export default function HomePage() {
               </div>
 
               <div className="p-4">
-                <h3 className="text-lg font-semibold text-gray-800">
+                <h3 className="text-xl font-bold text-gray-900">
                   ₹{item.price}
                 </h3>
 
-                <p className="text-gray-600 text-sm mt-1">{item.title}</p>
-
-                <p className="text-gray-400 text-xs mt-2">{item.location}</p>
-
-                <p className="text-gray-400 text-xs">
-                  {getTimeAgo(item.createdAt)}
+                <p className="text-gray-700 text-base mt-1 h-10 overflow-hidden line-clamp-2">
+                  {item.title}
                 </p>
+
+                <div className="flex justify-between items-center mt-3 text-xs text-gray-500">
+                  <p className="truncate">{item.location}</p>
+
+                  <p className="whitespace-nowrap">
+                    {getTimeAgo(item.createdAt)}
+                  </p>
+                </div>
               </div>
             </div>
           );
         })}
 
         {filtered.length === 0 && (
-          <p className="col-span-full text-center text-gray-500 text-lg">
-            No items found.
+          <p className="col-span-full text-center text-gray-500 text-lg py-12">
+            No items found matching your criteria. Try adjusting the search or category.
           </p>
         )}
       </div>

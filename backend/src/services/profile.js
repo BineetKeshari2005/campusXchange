@@ -7,7 +7,30 @@ export const getUserById = async (id) => {
 };
 
 export const updateUserById = async (id, data) => {
-  return await User.findByIdAndUpdate(id, data, { new: true }).select(
-    "-password"
-  );
+  // Define allowed fields to update
+  const allowedFields = [
+    "name",
+    "email",       // only if you want email update
+    "phone",
+    "hostel",
+    "room",
+    "bio",
+    "profilePhoto" // Cloudinary URL
+  ];
+
+  // Build clean update object
+  const updates = {};
+  for (const field of allowedFields) {
+    if (data[field] !== undefined) {
+      updates[field] = data[field];
+    }
+  }
+
+  const updatedUser = await User.findByIdAndUpdate(
+    id,
+    { $set: updates },
+    { new: true }
+  ).select("-password");
+
+  return updatedUser;
 };

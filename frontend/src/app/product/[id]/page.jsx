@@ -2,6 +2,19 @@
 
 import { useEffect, useState } from "react";
 import { useParams, useRouter } from "next/navigation";
+import { motion } from "framer-motion"; // Added for motion effects
+import { Tag, DollarSign, MapPin, Package, Clock, MessageSquare, User, Mail, Phone, Home, Hash, Info } from "lucide-react"; // Added Icons
+
+// Helper function (Safe to add, purely presentational)
+const formatDate = (dateString) => {
+    if (!dateString) return 'N/A';
+    try {
+        const options = { year: 'numeric', month: 'short', day: 'numeric' };
+        return new Date(dateString).toLocaleDateString(undefined, options);
+    } catch {
+        return 'Invalid Date';
+    }
+};
 
 export default function ProductDetail() {
   const { id } = useParams();
@@ -12,7 +25,7 @@ export default function ProductDetail() {
   const [loading, setLoading] = useState(true);
 
   // ---------------------------
-  // Fetch Product
+  // Fetch Product (LOGIC PRESERVED)
   // ---------------------------
   const fetchProduct = async () => {
     if (!id || id === "undefined") return;
@@ -42,7 +55,7 @@ export default function ProductDetail() {
   };
 
   // ---------------------------
-  // Fetch Seller Info
+  // Fetch Seller Info (LOGIC PRESERVED)
   // ---------------------------
   const fetchSeller = async (sellerId) => {
     const token = localStorage.getItem("token");
@@ -66,7 +79,7 @@ export default function ProductDetail() {
   };
 
   // ---------------------------
-  // Start Chat (FIXED)
+  // Start Chat (LOGIC PRESERVED)
   // ---------------------------
   const startChat = async () => {
     const token = localStorage.getItem("token");
@@ -117,71 +130,189 @@ export default function ProductDetail() {
 
   if (loading || !product) {
     return (
-      <div className="h-screen flex items-center justify-center text-gray-600">
-        Loading product...
+      // Enhanced Loading State
+      <div className="min-h-screen flex items-center justify-center bg-gray-50">
+        <div className="text-xl font-medium text-blue-600 flex items-center">
+            <span className="animate-spin rounded-full h-6 w-6 border-b-2 border-blue-500 mr-3"></span>
+            Loading product details...
+        </div>
       </div>
     );
   }
 
+  // Destructure product data for cleaner UI access
+  const { title, price, description, images, category, condition, location, createdAt } = product;
+  
+  // Destructure seller data (or provide defaults)
+  const sellerName = seller?.name || product.seller?.name || 'N/A';
+  const sellerId = seller?._id || product.seller?._id;
+
+
   return (
-    <div className="min-h-screen p-6 bg-white">
-      <h1 className="text-3xl font-bold">{product.title}</h1>
-
-      <img
-        src={product.images?.[0]}
-        className="w-full max-w-lg rounded-lg mt-4"
-      />
-
-      <p className="mt-4 text-xl font-semibold">₹{product.price}</p>
-      <p className="mt-2 text-gray-700">{product.description}</p>
-
-      {/* SELLER INFO */}
-      <div className="mt-8 bg-white rounded-xl border p-6 shadow-sm">
-        <h2 className="text-xl font-semibold mb-4">Seller Information</h2>
-
-        {!seller ? (
-          <p className="text-gray-500">Seller info not available.</p>
-        ) : (
-          <div className="space-y-3">
-            <div className="flex justify-between">
-              <span className="text-gray-600">Name:</span>
-              <span
-                className="font-medium text-blue-600 cursor-pointer"
-                onClick={() => router.push(`/user/${seller._id}`)}
-              >
-                {seller.name}
-              </span>
+    <div className="min-h-screen bg-gray-50 text-gray-800 pt-8 pb-12 px-4 md:px-8">
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.6 }}
+        className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-8"
+      >
+        
+        {/* === LEFT COLUMN (IMAGE & DESCRIPTION) === */}
+        <div className="lg:col-span-2 space-y-8">
+            
+            {/* --- Product Header (for mobile) --- */}
+            <div className="lg:hidden pb-4 border-b border-gray-200">
+                <h1 className="text-3xl font-extrabold text-gray-900">{title}</h1>
+                <p className="text-4xl font-extrabold text-blue-600 mt-2">
+                    ₹{price}
+                </p>
+                <motion.button
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                    onClick={startChat}
+                    className="mt-4 w-full flex items-center justify-center bg-blue-600 text-white py-3 rounded-xl text-lg font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/50"
+                >
+                    <MessageSquare className="w-5 h-5 mr-2" />
+                    Chat With Seller
+                </motion.button>
+            </div>
+            
+            {/* --- Image Gallery --- */}
+            <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100 p-4">
+                {images?.[0] ? (
+                    <img
+                        src={images[0]}
+                        alt={title}
+                        className="w-full h-96 object-contain rounded-lg bg-gray-100"
+                    />
+                ) : (
+                    <div className="w-full h-96 flex items-center justify-center bg-gray-200 text-gray-500 rounded-lg">
+                        <Info className="w-6 h-6 mr-2" /> No Image Available
+                    </div>
+                )}
             </div>
 
-            <div className="flex justify-between">
-              <span className="text-gray-600">Email:</span>
-              <span>{seller.email}</span>
+            {/* --- Key Attributes --- */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-4 border-b pb-2">Key Information</h2>
+                <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center">
+                    
+                    {/* Price */}
+                    <div className="p-3 bg-blue-50/70 rounded-lg border border-blue-100">
+                        <DollarSign className="w-5 h-5 text-blue-600 mx-auto mb-1" />
+                        <span className="text-sm font-semibold">₹{price}</span>
+                    </div>
+                    
+                    {/* Category */}
+                    <div className="p-3 bg-indigo-50/70 rounded-lg border border-indigo-100">
+                        <Tag className="w-5 h-5 text-indigo-600 mx-auto mb-1" />
+                        <span className="text-sm font-semibold capitalize">{category}</span>
+                    </div>
+
+                    {/* Condition */}
+                    <div className="p-3 bg-green-50/70 rounded-lg border border-green-100">
+                        <Package className="w-5 h-5 text-green-600 mx-auto mb-1" />
+                        <span className="text-sm font-semibold capitalize">{condition}</span>
+                    </div>
+                    
+                    {/* Posted Date */}
+                    <div className="p-3 bg-yellow-50/70 rounded-lg border border-yellow-100">
+                        <Clock className="w-5 h-5 text-yellow-600 mx-auto mb-1" />
+                        <span className="text-sm font-semibold">{formatDate(product.createdAt)}</span>
+                    </div>
+                </div>
             </div>
 
-            <div className="flex justify-between">
-              <span className="text-gray-600">Phone:</span>
-              <span>{seller.phone}</span>
+            {/* --- Description --- */}
+            <div className="bg-white rounded-xl shadow-lg border border-gray-100 p-6">
+                <h2 className="text-2xl font-bold text-gray-800 mb-3 border-b pb-2">Detailed Description</h2>
+                <p className="text-gray-700 leading-relaxed whitespace-pre-wrap">
+                    {description}
+                </p>
             </div>
+        </div>
 
-            <div className="flex justify-between">
-              <span className="text-gray-600">Hostel:</span>
-              <span>{seller.hostel}</span>
+        {/* === RIGHT COLUMN (PRICE & SELLER INFO) === */}
+        <div className="lg:col-span-1 space-y-8">
+            <div className="sticky top-8">
+
+                {/* --- Price & Main CTA (Desktop only) --- */}
+                <div className="hidden lg:block bg-white rounded-xl shadow-2xl border border-gray-100 p-6 mb-8 text-center">
+                    <h1 className="text-2xl font-semibold text-gray-900 mb-2">{title}</h1>
+                    <p className="text-5xl font-extrabold text-blue-600 my-4">
+                        ₹{price}
+                    </p>
+                    <motion.button
+                        whileHover={{ scale: 1.01 }}
+                        whileTap={{ scale: 0.99 }}
+                        onClick={startChat}
+                        className="mt-4 w-full flex items-center justify-center bg-blue-600 text-white py-4 rounded-xl text-lg font-bold hover:bg-blue-700 transition shadow-lg shadow-blue-500/50"
+                    >
+                        <MessageSquare className="w-5 h-5 mr-2" />
+                        Chat With Seller
+                    </motion.button>
+                </div>
+
+                {/* --- Seller Information Card --- */}
+                <div className="bg-white rounded-xl border border-gray-100 p-6 shadow-lg">
+                    <h2 className="text-xl font-bold mb-4 text-gray-800 flex items-center">
+                        <User className="w-5 h-5 mr-2 text-blue-500" /> Seller Information
+                    </h2>
+
+                    {!seller ? (
+                        <p className="text-gray-500">Seller info not available (requires authentication token).</p>
+                    ) : (
+                        <div className="space-y-3">
+                            
+                            {/* Seller Name */}
+                            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                                <span className="text-gray-600 flex items-center"><User className="w-4 h-4 mr-2" /> Name:</span>
+                                <span
+                                    className="font-semibold text-blue-600 hover:text-blue-700 cursor-pointer transition"
+                                    onClick={() => router.push(`/user/${sellerId}`)}
+                                >
+                                    {sellerName}
+                                </span>
+                            </div>
+
+                            {/* Location */}
+                            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                                <span className="text-gray-600 flex items-center"><MapPin className="w-4 h-4 mr-2" /> Location:</span>
+                                <span className="font-medium text-gray-800">{location || 'N/A'}</span>
+                            </div>
+
+
+                            {/* Hostel */}
+                            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                                <span className="text-gray-600 flex items-center"><Home className="w-4 h-4 mr-2" /> Hostel:</span>
+                                <span className="font-medium text-gray-800">{seller.hostel || 'N/A'}</span>
+                            </div>
+
+                            {/* Room No */}
+                            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                                <span className="text-gray-600 flex items-center"><Hash className="w-4 h-4 mr-2" /> Room No:</span>
+                                <span className="font-medium text-gray-800">{seller.room || 'N/A'}</span>
+                            </div>
+                            
+                            {/* Email */}
+                            <div className="flex items-center justify-between border-b border-gray-100 pb-2">
+                                <span className="text-gray-600 flex items-center"><Mail className="w-4 h-4 mr-2" /> Email:</span>
+                                <span className="text-sm text-gray-600 truncate">{seller.email || 'N/A'}</span>
+                            </div>
+
+                            {/* Phone */}
+                            <div className="flex items-center justify-between pt-2">
+                                <span className="text-gray-600 flex items-center"><Phone className="w-4 h-4 mr-2" /> Phone:</span>
+                                <span className="font-medium text-gray-800">{seller.phone || 'N/A'}</span>
+                            </div>
+                            
+                            {/* The Chat button is already in the main CTA section for better prominence */}
+                        </div>
+                    )}
+                </div>
             </div>
-
-            <div className="flex justify-between">
-              <span className="text-gray-600">Room No:</span>
-              <span>{seller.room}</span>
-            </div>
-
-            <button
-              onClick={startChat}
-              className="mt-5 w-full bg-blue-600 text-white py-3 rounded-lg hover:bg-blue-700"
-            >
-              Chat With Seller
-            </button>
-          </div>
-        )}
-      </div>
+        </div>
+      </motion.div>
     </div>
   );
 }

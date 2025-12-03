@@ -1,9 +1,11 @@
+// Signup.js
 "use client";
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { motion } from "framer-motion";
-import { UserPlus, Mail, Lock } from "lucide-react";
+import { UserPlus, Mail, Lock, User } from "lucide-react"; // Added 'User' icon for name field
+import Image from "next/image";
 
 export default function Signup() {
   const router = useRouter();
@@ -13,6 +15,9 @@ export default function Signup() {
     password: "",
   });
   const [loading, setLoading] = useState(false);
+  
+  // NOTE: Use the same image URL as the Login page
+  const IMAGE_URL = "https://lh3.googleusercontent.com/p/AF1QipNWC_MbFAfLlUcchLXGGmEYlawRXIimq6hvFJKx=s1360-w1360-h1020-rw";
 
   const handleChange = (e) => {
     const { name, value } = e.target;
@@ -53,95 +58,136 @@ export default function Signup() {
   };
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-b from-[#0B0A1B] via-[#141022] to-[#1A162B] text-white px-4">
+    // Outer container: Full screen height, light background, flex container
+    <div className="h-screen w-full flex bg-gray-50 text-gray-800 p-4 md:p-8">
       <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.8 }}
-        className="relative w-full max-w-md p-8 rounded-2xl border border-[#2D2845] bg-gradient-to-br from-[#1A162B]/80 to-[#0F0B1E]/60 shadow-2xl backdrop-blur-lg"
+        initial={{ opacity: 0, scale: 0.98 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.6 }}
+        // Main Card: Full height, 50/50 split on medium screens
+        className="w-full h-full overflow-hidden rounded-xl border border-gray-200 bg-white shadow-2xl shadow-gray-300/50 grid grid-cols-1 md:grid-cols-2"
       >
-        {/* Glow Accent */}
-        <div className="absolute inset-0 rounded-2xl bg-gradient-to-br from-purple-600/20 to-transparent opacity-40 blur-2xl"></div>
-
-        {/* Header */}
-        <div className="relative z-10 text-center mb-8">
-          <div className="inline-flex items-center justify-center w-14 h-14 rounded-full bg-purple-600/20 border border-purple-500/30 mb-4">
-            <UserPlus className="w-7 h-7 text-purple-400" />
+        
+        {/* === LEFT COLUMN: IMAGE AND INTRO (50% Width) === */}
+        <div className="relative h-64 md:h-auto bg-gray-900">
+          
+          {/* Image Component with fixed URL */}
+          <Image
+            src={IMAGE_URL}
+            alt="Campus Building"
+            fill
+            style={{ objectFit: 'cover' }}
+            priority
+            className="opacity-70"
+          />
+          
+          {/* Overlay and Text */}
+          <div className="absolute inset-0 bg-black/60 flex flex-col justify-end p-8 text-white">
+            <h2 className="text-xl font-medium tracking-tight">
+              Join
+            </h2>
+            <h1 className="text-4xl font-extrabold mt-1">
+              CampusXchange
+            </h1>
+            <p className="text-gray-200 text-sm mt-3">
+              Your centralized marketplace for buying and selling student essentials.
+            </p>
           </div>
-          <h1 className="text-3xl font-bold">Create Account</h1>
-          <p className="text-gray-400 text-sm mt-1">
-            Join and explore your dashboard instantly
-          </p>
         </div>
 
-        {/* Form */}
-        <form onSubmit={handleSubmit} className="relative z-10 space-y-5">
-          <div className="relative">
-            <UserPlus className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-            <input
-              type="text"
-              name="name"
-              placeholder="Full Name"
-              value={formData.name}
-              onChange={handleChange}
-              className="w-full p-3 pl-10 rounded-md bg-[#1A162B] border border-[#2D2845] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-              required
-            />
+        {/* === RIGHT COLUMN: SIGNUP FORM (50% Width) === */}
+        <div className="p-10 flex flex-col justify-center">
+          
+          {/* Header */}
+          <div className="text-left mb-6">
+            <h2 className="text-2xl font-bold text-gray-900">
+              Create Your Account
+            </h2>
+            <p className="text-gray-500 text-sm mt-1">
+                It only takes a minute to get started.
+            </p>
           </div>
 
-          <div className="relative">
-            <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-            <input
-              type="email"
-              name="email"
-              placeholder="Email Address"
-              value={formData.email}
-              onChange={handleChange}
-              className="w-full p-3 pl-10 rounded-md bg-[#1A162B] border border-[#2D2845] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-              required
-            />
-          </div>
+          {/* Form */}
+          <form onSubmit={handleSubmit} className="relative z-10 space-y-4">
+            
+            {/* Name Input */}
+            <div className="relative">
+              <User className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+              <input
+                type="text"
+                name="name"
+                placeholder="Full Name"
+                value={formData.name}
+                onChange={handleChange}
+                // Light input styling matching Login page
+                className="w-full p-3 pl-10 rounded-lg bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm"
+                required
+              />
+            </div>
 
-          <div className="relative">
-            <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
-            <input
-              type="password"
-              name="password"
-              placeholder="Password"
-              value={formData.password}
-              onChange={handleChange}
-              className="w-full p-3 pl-10 rounded-md bg-[#1A162B] border border-[#2D2845] text-white placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-purple-500 transition"
-              required
-            />
-          </div>
+            {/* Email Input */}
+            <div className="relative">
+              <Mail className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+              <input
+                type="email"
+                name="email"
+                placeholder="Email Address"
+                value={formData.email}
+                onChange={handleChange}
+                // Light input styling matching Login page
+                className="w-full p-3 pl-10 rounded-lg bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm"
+                required
+              />
+            </div>
 
-          <motion.button
-            whileHover={{ scale: 1.03 }}
-            whileTap={{ scale: 0.97 }}
-            type="submit"
-            disabled={loading}
-            className={`w-full ${
-              loading
-                ? "bg-gray-600 cursor-not-allowed"
-                : "bg-gradient-to-r from-purple-600 to-indigo-500 hover:from-purple-500 hover:to-indigo-400"
-            } text-white p-3 rounded-md font-semibold transition-colors shadow-lg`}
-          >
-            {loading ? "Creating Account..." : "Sign Up"}
-          </motion.button>
-        </form>
+            {/* Password Input */}
+            <div className="relative">
+              <Lock className="absolute left-3 top-3 w-5 h-5 text-gray-400" />
+              <input
+                type="password"
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleChange}
+                // Light input styling matching Login page
+                className="w-full p-3 pl-10 rounded-lg bg-gray-50 border border-gray-300 text-gray-800 placeholder-gray-500 focus:outline-none focus:ring-1 focus:ring-blue-500 focus:border-blue-500 transition shadow-sm"
+                required
+              />
+            </div>
 
-        {/* Footer */}
-        <div className="relative z-10 mt-5 text-center">
-          <p className="text-gray-400 text-sm">
-            Already have an account?{" "}
-            <a
-              href="/auth/login"
-              className="text-purple-400 hover:text-purple-300 font-medium"
+            {/* Submit Button */}
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              type="submit"
+              disabled={loading}
+              // Primary Blue Button matching Login page
+              className={`w-full ${
+                loading
+                  ? "bg-gray-400 cursor-not-allowed"
+                  : "bg-blue-600 hover:bg-blue-700 shadow-md shadow-blue-400/50"
+              } text-white p-3 rounded-lg font-semibold transition-colors`}
             >
-              Login
-            </a>
-          </p>
+              {loading ? "Creating Account..." : "Sign Up"}
+            </motion.button>
+          </form>
+
+          {/* Footer Link */}
+          <div className="relative z-10 mt-6 text-center">
+            <p className="text-gray-500 text-sm">
+              Already have an account?{" "}
+              <a
+                href="/auth/login"
+                // Blue link matching Login page
+                className="text-blue-600 hover:text-blue-700 font-semibold transition"
+              >
+                Login
+              </a>
+            </p>
+          </div>
         </div>
+
       </motion.div>
     </div>
   );
