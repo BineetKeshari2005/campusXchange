@@ -137,13 +137,7 @@ export default function PublicUserProfile() {
                 </div>
 
                 {/* Contact Button */}
-                <button
-                    onClick={() => alert("Chat coming soon!")}
-                    className="w-full md:w-auto flex items-center justify-center space-x-2 bg-blue-600 hover:bg-blue-700 text-white py-3 px-6 rounded-xl font-semibold transition shadow-md shadow-blue-500/50"
-                >
-                    <MessageSquare className="w-5 h-5" />
-                    <span>Contact Seller</span>
-                </button>
+
             </div>
 
             {/* Contact Details Grid */}
