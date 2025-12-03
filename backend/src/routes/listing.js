@@ -25,7 +25,13 @@ router.post(
   createListing
 );
 
-router.put("/:id", authenticateToken, updateListing);
+router.put(
+  "/:id",
+  authenticateToken,
+  upload.array("images", 5),
+  updateListing
+);
+
 router.delete("/:id", authenticateToken, deleteListing);
 
 

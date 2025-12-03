@@ -79,13 +79,11 @@ export const getListingById = async (id) => {
 // UPDATE LISTING
 // ================================
 export const updateListing = async (id, userId, data) => {
-  const listing = await Listing.findOneAndUpdate(
-    { _id: id, seller: userId }, // Ensure only owner can update
+  return await Listing.findOneAndUpdate(
+    { _id: id, seller: userId },
     data,
     { new: true }
   );
-
-  return listing;
 };
 
 

@@ -1,5 +1,6 @@
 import * as listingService from "../services/listing.js";
 import { getMyListings } from "../services/listing.js";
+import { uploadToCloudinary } from "../services/upload.js";
 
 export const createListing = async (req, res, next) => {
   try {
@@ -51,47 +52,39 @@ export const getListingById = async (req, res, next) => {
   }
 };
 
-export const updateListing = async (req, res, next) => {
+export const updateListing = async (req, res) => {
   try {
-    const userId = req.user?.id;
     const listingId = req.params.id;
+    const userId = req.user.id;
 
-    // Upload new images if provided
-    let uploadedImages = [];
+    let updateData = { ...req.body };
 
+    // Cloudinary images are already uploaded by multer-storage-cloudinary
     if (req.files && req.files.length > 0) {
-      uploadedImages = await Promise.all(
-        req.files.map((file) => uploadToCloudinary(file.buffer))
-      );
+      const cloudinaryUrls = req.files.map((file) => file.path);
+      updateData.images = cloudinaryUrls; // direct URLs
     }
 
-    const updateData = { ...req.body };
-
-    // If images were uploaded, update them
-    if (uploadedImages.length > 0) {
-      updateData.images = uploadedImages;
-    }
-
-    const updatedListing = await listingService.updateListing(
+    const updated = await listingService.updateListing(
       listingId,
       userId,
       updateData
     );
 
-    if (!updatedListing) {
+    if (!updated) {
       return res.status(404).json({
-        message: "Listing not found OR you are not the owner",
+        message: "Listing not found or you are not the owner",
       });
     }
 
     res.status(200).json({
       message: "Listing updated",
-      data: updatedListing,
+      data: updated,
     });
 
   } catch (err) {
     console.error("UPDATE ERROR:", err);
-    next(err);
+    res.status(500).json({ message: "Internal Server Error" });
   }
 };
 
