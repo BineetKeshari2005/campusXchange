@@ -6,14 +6,17 @@ export const createListing = async (req, res, next) => {
     if (!req.user?.id) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const imageUrls = await Promise.all(
-  (req.files || []).map((file) => uploadToCloudinary(file.buffer))
-); // Cloudinary URL
+    
+    // ------------------------------------------------------------------
+    // ✅ FIX: Use the 'path' property provided by multer-storage-cloudinary
+    // ------------------------------------------------------------------
+    const imageUrls = (req.files || []).map((file) => file.path);
+    // ------------------------------------------------------------------
     
     const data = {
       ...req.body,
       seller: req.user.id, // ⬅ IMPORTANT: using your token payload
-        images: imageUrls,
+      images: imageUrls,
     };
 
     const listing = await listingService.createListing(data);
@@ -51,21 +54,43 @@ export const getListingById = async (req, res, next) => {
 export const updateListing = async (req, res, next) => {
   try {
     const userId = req.user?.id;
+    const listingId = req.params.id;
 
-    const listing = await listingService.updateListing(
-      req.params.id,
+    // Upload new images if provided
+    let uploadedImages = [];
+
+    if (req.files && req.files.length > 0) {
+      uploadedImages = await Promise.all(
+        req.files.map((file) => uploadToCloudinary(file.buffer))
+      );
+    }
+
+    const updateData = { ...req.body };
+
+    // If images were uploaded, update them
+    if (uploadedImages.length > 0) {
+      updateData.images = uploadedImages;
+    }
+
+    const updatedListing = await listingService.updateListing(
+      listingId,
       userId,
-      req.body
+      updateData
     );
 
-    if (!listing) {
+    if (!updatedListing) {
       return res.status(404).json({
         message: "Listing not found OR you are not the owner",
       });
     }
 
-    res.status(200).json({ message: "Listing updated", data: listing });
+    res.status(200).json({
+      message: "Listing updated",
+      data: updatedListing,
+    });
+
   } catch (err) {
+    console.error("UPDATE ERROR:", err);
     next(err);
   }
 };

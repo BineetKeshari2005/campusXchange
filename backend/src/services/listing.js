@@ -79,12 +79,15 @@ export const getListingById = async (id) => {
 // UPDATE LISTING
 // ================================
 export const updateListing = async (id, userId, data) => {
-  return await Listing.findOneAndUpdate(
-    { _id: id, seller: userId },
+  const listing = await Listing.findOneAndUpdate(
+    { _id: id, seller: userId }, // Ensure only owner can update
     data,
     { new: true }
   );
+
+  return listing;
 };
+
 
 // ================================
 // DELETE LISTING
