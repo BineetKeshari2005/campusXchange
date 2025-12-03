@@ -13,6 +13,7 @@ import listingRoutes from "./routes/listing.js";
 import profileRoutes from "./routes/profile.js";
 import savedRoutes from "./routes/saved.js";
 import publicUserRoutes from "./routes/publicUser.js";
+import chatService from "./services/chat.js";
 
 
 dotenv.config();

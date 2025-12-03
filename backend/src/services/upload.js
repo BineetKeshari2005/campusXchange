@@ -1,12 +1,16 @@
-import cloudinary from "../configuration/cloudinary.js";
+import { v2 as cloudinary } from "cloudinary";
 
-export const uploadToCloudinary = async (fileBuffer) => {
+export const uploadToCloudinary = (buffer) => {
   return new Promise((resolve, reject) => {
-    cloudinary.uploader
-      .upload_stream({ folder: "profile_photos" }, (error, result) => {
+    const uploadStream = cloudinary.uploader.upload_stream(
+      { folder: "campusxchange/listings" },
+      (error, result) => {
         if (error) reject(error);
         else resolve(result.secure_url);
-      })
-      .end(fileBuffer);
+      }
+    );
+
+    uploadStream.end(buffer);
   });
 };
+

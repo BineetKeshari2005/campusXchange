@@ -6,7 +6,9 @@ export const createListing = async (req, res, next) => {
     if (!req.user?.id) {
       return res.status(401).json({ message: "Unauthorized" });
     }
-    const imageUrls = (req.files || []).map((file) => file.path); // Cloudinary URL
+    const imageUrls = await Promise.all(
+  (req.files || []).map((file) => uploadToCloudinary(file.buffer))
+); // Cloudinary URL
     
     const data = {
       ...req.body,

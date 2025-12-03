@@ -3,7 +3,7 @@ import Listing from "../models/listing.js";
 // ================================
 // GET ALL LISTINGS WITH FILTERS
 // ================================
-export const getAllListings = async (query) => {
+export const getListings = async (query) => {
   let {
     search,
     category,
@@ -20,41 +20,24 @@ export const getAllListings = async (query) => {
 
   const filter = {};
 
-  // SEARCH filter
-  if (search) {
-    filter.title = { $regex: search, $options: "i" };
-  }
-
-  // CATEGORY filter
-  if (category && category !== "All") {
+  if (search) filter.title = { $regex: search, $options: "i" };
+  if (category && category !== "All")
     filter.category = category.toLowerCase();
-  }
 
-  // PRICE RANGE
   if (minPrice || maxPrice) {
     filter.price = {};
     if (minPrice) filter.price.$gte = Number(minPrice);
     if (maxPrice) filter.price.$lte = Number(maxPrice);
   }
 
-  // CONDITION filter
-  if (condition) {
-    filter.condition = condition.toLowerCase();
-  }
+  if (condition) filter.condition = condition.toLowerCase();
 
-  // ----------------------------
-  // SORTING
-  // ----------------------------
   let sortOptions = {};
-
   if (sort === "newest") sortOptions = { createdAt: -1 };
   else if (sort === "price_asc") sortOptions = { price: 1 };
   else if (sort === "price_desc") sortOptions = { price: -1 };
-  else sortOptions = { createdAt: -1 }; // default
+  else sortOptions = { createdAt: -1 };
 
-  // ----------------------------
-  // PAGINATION
-  // ----------------------------
   const skip = (page - 1) * limit;
 
   const [items, total] = await Promise.all([
@@ -79,33 +62,35 @@ export const getAllListings = async (query) => {
 };
 
 // ================================
-// GET SINGLE LISTING BY ID
+// CREATE LISTING
+// ================================
+export const createListing = async (data) => {
+  return await Listing.create(data);
+};
+
+// ================================
+// GET SINGLE LISTING
 // ================================
 export const getListingById = async (id) => {
   return await Listing.findById(id).populate("seller", "name email");
 };
 
 // ================================
-// CREATE LISTING
-// ================================
-export const createListing = async (data) => {
-  console.log("REQ FILES:", req.files);
-  console.log("REQ BODY:", req.body);
-  return await Listing.create(data);
-};
-
-// ================================
 // UPDATE LISTING
 // ================================
-export const updateListingById = async (id, data) => {
-  return await Listing.findByIdAndUpdate(id, data, { new: true });
+export const updateListing = async (id, userId, data) => {
+  return await Listing.findOneAndUpdate(
+    { _id: id, seller: userId },
+    data,
+    { new: true }
+  );
 };
 
 // ================================
 // DELETE LISTING
 // ================================
-export const deleteListingById = async (id) => {
-  return await Listing.findByIdAndDelete(id);
+export const deleteListing = async (id, userId) => {
+  return await Listing.findOneAndDelete({ _id: id, seller: userId });
 };
 
 // ================================
