@@ -24,6 +24,7 @@ export const createListing = async (req, res, next) => {
 
     res.status(201).json({ message: "Listing created", data: listing });
   } catch (err) {
+    console.error("CRITICAL LISTING CREATION ERROR:", err);
     next(err);
   }
 };
