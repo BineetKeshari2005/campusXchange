@@ -8,15 +8,13 @@ export const createListing = async (req, res, next) => {
       return res.status(401).json({ message: "Unauthorized" });
     }
     
-    // ------------------------------------------------------------------
-    // ✅ FIX: Use the 'path' property provided by multer-storage-cloudinary
-    // ------------------------------------------------------------------
+
     const imageUrls = (req.files || []).map((file) => file.path);
-    // ------------------------------------------------------------------
+
     
     const data = {
       ...req.body,
-      seller: req.user.id, // ⬅ IMPORTANT: using your token payload
+      seller: req.user.id, 
       images: imageUrls,
     };
 
@@ -60,10 +58,10 @@ export const updateListing = async (req, res) => {
 
     let updateData = { ...req.body };
 
-    // Cloudinary images are already uploaded by multer-storage-cloudinary
+
     if (req.files && req.files.length > 0) {
       const cloudinaryUrls = req.files.map((file) => file.path);
-      updateData.images = cloudinaryUrls; // direct URLs
+      updateData.images = cloudinaryUrls;
     }
 
     const updated = await listingService.updateListing(

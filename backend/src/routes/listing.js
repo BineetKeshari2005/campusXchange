@@ -14,7 +14,7 @@ import { fetchMyListings } from "../controllers/listing.js";
 const router = express.Router();
 
 router.get("/my", authenticateToken, fetchMyListings);
-// PUBLIC ROUTES
+
 router.get("/", getListings);
 router.get("/:id", getListingById);
 

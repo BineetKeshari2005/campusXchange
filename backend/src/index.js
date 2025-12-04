@@ -108,7 +108,7 @@ app.use("/user", signupRoute);
 app.use("/auth", loginRoute);
 app.use("/api", userRoute);
 app.use("/api/public-user", publicUserRoutes);
-
+app.use('/api/users', userRoute);
 // Root
 app.get("/", (req, res) => {
   res.send("CampusXchange API with Real-Time Chat 🚀");

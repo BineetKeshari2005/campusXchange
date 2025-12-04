@@ -1,8 +1,6 @@
 import Listing from "../models/listing.js";
 
-// ================================
-// GET ALL LISTINGS WITH FILTERS
-// ================================
+
 export const getListings = async (query) => {
   let {
     search,
@@ -61,23 +59,17 @@ export const getListings = async (query) => {
   };
 };
 
-// ================================
-// CREATE LISTING
-// ================================
+
 export const createListing = async (data) => {
   return await Listing.create(data);
 };
 
-// ================================
-// GET SINGLE LISTING
-// ================================
+
 export const getListingById = async (id) => {
   return await Listing.findById(id).populate("seller", "name email");
 };
 
-// ================================
-// UPDATE LISTING
-// ================================
+
 export const updateListing = async (id, userId, data) => {
   return await Listing.findOneAndUpdate(
     { _id: id, seller: userId },
@@ -87,16 +79,12 @@ export const updateListing = async (id, userId, data) => {
 };
 
 
-// ================================
-// DELETE LISTING
-// ================================
+
 export const deleteListing = async (id, userId) => {
   return await Listing.findOneAndDelete({ _id: id, seller: userId });
 };
 
-// ================================
-// GET LISTINGS FOR LOGGED-IN USER
-// ================================
+
 export const getMyListings = async (userId) => {
   return await Listing.find({ seller: userId }).sort({ createdAt: -1 });
 };
