@@ -16,7 +16,7 @@ export const getListings = async (query) => {
   page = parseInt(page);
   limit = parseInt(limit);
 
-  const filter = {};
+  const filter = { status: "available" };
 
   if (search) filter.title = { $regex: search, $options: "i" };
   if (category && category !== "All")
@@ -45,7 +45,7 @@ export const getListings = async (query) => {
       .skip(skip)
       .limit(limit),
 
-    Listing.countDocuments(filter),
+    Listing.countDocuments({ status: "available", ...filter }),
   ]);
 
   return {

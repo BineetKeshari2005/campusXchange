@@ -16,6 +16,7 @@ export const createListing = async (req, res, next) => {
       ...req.body,
       seller: req.user.id, 
       images: imageUrls,
+      status: "available"
     };
 
     const listing = await listingService.createListing(data);

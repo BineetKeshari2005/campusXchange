@@ -302,9 +302,11 @@ export default function SellPage() {
                 placeholder="e.g., Hostel Block C, Room 101"
             />
           </div>
+
         </div>
 
         <hr className="my-8 border-gray-200" />
+
         
         {/* SUBMIT BUTTON */}
         <motion.button

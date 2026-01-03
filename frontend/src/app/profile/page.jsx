@@ -99,6 +99,69 @@ export default function ProfilePage() {
           <Detail label="Bio" value={profile.bio} />
         </div>
 
+        {/* PAYMENT SETUP CARD */}
+<div className="mt-10 p-6 border rounded-xl bg-indigo-50">
+  <h3 className="text-xl font-bold mb-2 text-indigo-700">Payment Setup</h3>
+
+  {profile.paymentStatus === "not_enabled" && (
+    <>
+      <p className="text-gray-700 mb-4">
+        Enable payments to start receiving money from buyers.
+      </p>
+
+      <button
+        onClick={async () => {
+          const token = localStorage.getItem("token");
+
+          const res = await fetch(
+            `${process.env.NEXT_PUBLIC_API_URL}/api/payments/seller/onboard`,
+            {
+              method: "POST",
+              headers: { Authorization: `Bearer ${token}` }
+            }
+          );
+
+          const data = await res.json();
+          window.location.href = data.url;
+        }}
+        className="bg-indigo-600 text-white px-6 py-3 rounded-xl hover:bg-indigo-700 transition"
+      >
+        Enable Payments
+      </button>
+    </>
+  )}
+
+  {profile.paymentStatus === "pending" && (
+    <p className="text-yellow-600 font-semibold">
+      ⏳ Razorpay verification in progress. Please complete onboarding.
+    </p>
+  )}
+
+  {profile.paymentStatus === "active" && (
+    <p className="text-green-600 font-semibold">
+      ✅ Payments enabled — buyers can now pay you.
+    </p>
+  )}
+</div>
+
+{/* DASHBOARD BUTTONS */}
+<div className="grid grid-cols-2 gap-4 mt-8">
+  <button
+    onClick={() => router.push("/seller/sold")}
+    className="bg-green-600 text-white py-3 rounded-xl font-semibold hover:bg-green-700 transition"
+  >
+    My Sales
+  </button>
+
+  <button
+    onClick={() => router.push("/buyer/bought")}
+    className="bg-blue-600 text-white py-3 rounded-xl font-semibold hover:bg-blue-700 transition"
+  >
+    My Purchases
+  </button>
+</div>
+
+
         {/* EDIT PROFILE BUTTON */}
         <div className="flex justify-center mt-8">
           <button

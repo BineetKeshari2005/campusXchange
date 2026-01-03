@@ -87,7 +87,6 @@ export default function MyListingsPage() {
       <h1 className="text-3xl font-bold text-blue-600 mb-6 text-center">
         My Listings
       </h1>
-
       {listings.length === 0 ? (
         <p className="text-center text-gray-500 text-lg mt-10">
           You haven't listed anything yet.

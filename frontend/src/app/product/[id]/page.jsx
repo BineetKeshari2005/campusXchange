@@ -81,52 +81,78 @@ export default function ProductDetail() {
   // ---------------------------
   // Start Chat (LOGIC PRESERVED)
   // ---------------------------
-  const startChat = async () => {
-    const token = localStorage.getItem("token");
+const startChat = async () => {
+  const token = localStorage.getItem("token");
 
-    if (!token) {
-      alert("Please login to chat");
-      router.push("/auth/login");
+  if (!token) {
+    alert("Please login to chat");
+    router.push("/auth/login");
+    return;
+  }
+
+  try {
+    const res = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/api/chat/start/${product._id}`,
+      {
+        method: "POST",
+        headers: {
+          Authorization: `Bearer ${token}`
+        }
+      }
+    );
+
+    const convo = await res.json();
+
+    if (!res.ok) {
+      alert(convo.message || "Failed to start chat");
       return;
     }
 
-    try {
-      const res = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/chat/start`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            Authorization: `Bearer ${token}`,
-          },
-          body: JSON.stringify({
-            sellerId: product.seller._id,     // ONLY send this
-          }),
-        }
-      );
+    router.push(`/chat/${convo._id}`);
+  } catch (err) {
+    console.error("Chat start error:", err);
+    alert("Failed to start chat");
+  }
+};
 
-      const data = await res.json();
-      console.log("CHAT START RESPONSE:", data);
-
-      if (!res.ok) {
-        alert(data.message || "Failed to start chat");
-        return;
-      }
-
-      router.push(
-        `/chat/${data.conversationId}?other=${product.seller._id}&name=${encodeURIComponent(
-          product.seller.name
-        )}`
-      );
-    } catch (err) {
-      console.error("Chat start error:", err);
-      alert("Failed to start chat");
-    }
-  };
 
   useEffect(() => {
     fetchProduct();
   }, [id]);
+const buyNow = async () => {
+  const token = localStorage.getItem("token");
+  if (!token) return router.push("/auth/login");
+
+const order = await fetch(
+  `${process.env.NEXT_PUBLIC_API_URL}/api/payments/pay/${product._id}`,
+  { method: "POST", headers: { Authorization: `Bearer ${token}` } }
+).then(r => r.json());
+
+new window.Razorpay({
+  key: process.env.NEXT_PUBLIC_RAZORPAY_KEY_ID,
+  amount: order.amount,
+  currency: order.currency,
+  name: "CampusXchange",
+  description: product.title,
+  order_id: order.id,
+  handler: async (response) => {
+    const verify = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/api/payments/verify`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        Authorization: `Bearer ${token}`
+      },
+      body: JSON.stringify(response)
+    });
+
+    if (verify.ok) {
+      router.push("/home");          // 👈 redirect home
+    } else {
+      alert("Payment verification failed");
+    }
+  }
+}).open();
+}
 
   if (loading || !product) {
     return (
@@ -161,7 +187,7 @@ export default function ProductDetail() {
         <div className="lg:col-span-2 space-y-8">
             
             {/* --- Product Header (for mobile) --- */}
-            <div className="lg:hidden pb-4 border-b border-gray-200">
+            <div className="block lg:hidden pb-4 border-b border-gray-200">
                 <h1 className="text-3xl font-extrabold text-gray-900">{title}</h1>
                 <p className="text-4xl font-extrabold text-blue-600 mt-2">
                     ₹{price}
@@ -175,7 +201,20 @@ export default function ProductDetail() {
                     <MessageSquare className="w-5 h-5 mr-2" />
                     Chat With Seller
                 </motion.button>
+            
+            <motion.button
+              whileHover={{ scale: 1.01 }}
+              whileTap={{ scale: 0.99 }}
+              onClick={buyNow}
+              className="mt-3 w-full flex items-center justify-center bg-green-600 text-white py-3 rounded-xl text-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-500/50"
+            >
+                Buy Now
+              </motion.button>
+                
             </div>
+
+  
+          
             
             {/* --- Image Gallery --- */}
             <div className="bg-white rounded-xl shadow-xl overflow-hidden border border-gray-100 p-4">
@@ -251,6 +290,14 @@ export default function ProductDetail() {
                         <MessageSquare className="w-5 h-5 mr-2" />
                         Chat With Seller
                     </motion.button>
+                    <motion.button
+                            whileHover={{ scale: 1.01 }}
+                            whileTap={{ scale: 0.99 }}
+                            onClick={buyNow}
+                            className="mt-3 w-full flex items-center justify-center bg-green-600 text-white py-3 rounded-xl text-lg font-bold hover:bg-green-700 transition shadow-lg shadow-green-500/50"
+                          >
+                              Buy Now
+                      </motion.button>
                 </div>
 
                 {/* --- Seller Information Card --- */}

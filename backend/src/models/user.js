@@ -18,6 +18,16 @@ const userSchema = new mongoose.Schema(
 
     profilePhoto: { type: String, default: "" }, // Cloudinary URL
 
+    razorpayAccountId: { type: String },
+    paymentStatus: {
+      type: String,
+      enum: ["not_enabled", "pending_verification", "active"],
+      default: "not_enabled"
+    },
+
+  //    sold: [{ type: mongoose.Schema.Types.ObjectId, ref: "Listing" }],
+  // bought: [{ type: mongoose.Schema.Types.ObjectId, ref: "Listing" }],
+
     savedListings: [
       { type: mongoose.Schema.Types.ObjectId, ref: "Listing" }
     ],

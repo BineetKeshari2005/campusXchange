@@ -16,4 +16,5 @@ router.get("/", authenticateToken, getUser); // Use "/" for resource root
 // It uses `authenticateToken` to ensure only the logged-in user can delete their profile.
 router.delete("/me", authenticateToken, deleteUser);
 
+
 export default router;
